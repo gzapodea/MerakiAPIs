@@ -1,4 +1,4 @@
 # MerakiAPIs
 
-This repo wiill be used for Mearki API use cases.
+This repo will be used for Meraki API use cases.
 
