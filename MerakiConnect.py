@@ -101,6 +101,19 @@ def meraki_get_sm_devices(network_id):
     return sm_devices_json
 
 
+def meraki_get_devices(network_id):
+    """
+    This function will return a list with all the network devices associated with the Meraki Network Id
+    :param network_id: Meraki Network ID
+    :return: list with all the devices
+    """
+    url = MERAKI_URL + '/networks/' + str(network_id) + '/devices'
+    header = {'content-type': 'application/json', 'X-Cisco-Meraki-API-Key': MERAKI_API_KEY}
+    devices_response = requests.get(url, headers=header, verify=False)
+    devices_json = devices_response.json()
+    return devices_json
+
+
 def get_user_cell(users_info, email):
     """
     This function will look up the user cell phone based on his email

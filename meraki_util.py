@@ -1,38 +1,10 @@
+
+
 # developed by Gabi Zapodeanu, TSA, GSS, Cisco Systems
 
 # !/usr/bin/env python3
 
-import requests
-import json
-import time
-import datetime
-import meraki_init
-import requests.packages.urllib3
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from requests.auth import HTTPBasicAuth  # for Basic Auth
-
-from meraki_init import MERAKI_API_KEY, MERAKI_ORG_ID
-
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)  # Disable insecure https warnings
-
-# The following declarations need to be updated based on your lab environment
-
-users_info_list = [{'name': 'Gabi Zapodeanu', 'email': 'gzapodea@cisco.com', 'cell': '+15033094949'},
-                   {'name': 'Gabriel Zapodeanu', 'email': 'gabriel.zapodeanu@gmail.com', 'cell': '+15036252333'}]
-
-user_email = 'gzapodea@cisco.com'
-
-MERAKI_URL = 'https://dashboard.meraki.com/api/v0'
-
-
-def pprint(json_data):
-    """
-    Pretty print JSON formatted data
-    :param json_data:
-    :return:
-    """
-
-    print(json.dumps(json_data, indent=4, separators=(' , ', ' : ')))
+# this module include common utilized functions to create applications using Meraki APIs
 
 
 
@@ -124,46 +96,21 @@ def get_location_cell(sm_devices_list, user_cell):
     return location
 
 
-def main():
+def meraki_get_ssids(network_id):
+    """
+    This function will return the Meraki Network id list of configured SSIDs
+    :param network_id: Meraki Network id
+    :return: list of SSIDs
+    """
+    url = MERAKI_URL + '/networks/' + str(network_id) + '/ssids'
+    header = {'content-type': 'application/json', 'X-Cisco-Meraki-API-Key': MERAKI_API_KEY}
+    ssids_response = requests.get(url, headers=header, verify=False)
+    ssids_json = ssids_response.json()
 
-    print('\nThe user directory is:')
-    pprint(users_info_list)
-    # get the Meraki organization id
+    # filter only configured SSIDs
+    ssids_list = []
+    for ssid in ssids_json:
+        if 'Unconfigured' not in ssid['name']:
+            ssids_list.append(ssid)
+    return ssids_list
 
-    meraki_org_id = meraki_get_organizations()
-    print('\nYour Meraki Organization ID is: ', meraki_org_id)
-
-    # get the Meraki networks info
-
-    meraki_network_info = meraki_get_networks(meraki_org_id)
-    meraki_network_id = meraki_network_info[0]
-    meraki_network_name = meraki_network_info[1]
-
-    print('Your Meraki Network ID is: ', meraki_network_id)
-    print('Your Meraki Network Name is: ', meraki_network_name)
-
-    # get the Meraki Network Devices
-
-    meraki_devices_list = meraki_get_devices(meraki_network_id)
-    print('\nYour Meraki Network Devices are: ')
-    pprint(meraki_devices_list)
-
-    # get the Meraki SM devices
-
-    meraki_sm_devices_list = meraki_get_sm_devices(meraki_network_id)
-    #print('Your Meraki SM Devices list: \n')
-    #pprint(meraki_sm_devices_list)
-
-    # find out the user cell phone number based on email address
-
-    user_cell = get_user_cell(users_info_list, user_email)
-    print('\nThe SM user with the email ', user_email, ' has the cell phone number ', user_cell)
-
-    # find the location for the device with the specified cell phone number
-
-    user_location = get_location_cell(meraki_sm_devices_list,user_cell)
-    print('\nThe SM user with the cell phone ', user_cell, ' is located at this address ', user_location)
-
-
-if __name__ == '__main__':
-    main()
