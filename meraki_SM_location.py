@@ -93,7 +93,6 @@ def get_user_cell(users_info, email):
     user_cell = None
     for user in users_info:
         if user['email'] == email:
-            pprint(user)
             user_cell = user['cell']
     return user_cell
 
@@ -108,6 +107,7 @@ def get_location_cell(sm_devices_list, user_cell):
     location = None
     for device in sm_devices_list:
         if device['phoneNumber'] == user_cell:
+            pprint(device)
             location = device['location']
     return location
 
