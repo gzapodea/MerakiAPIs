@@ -75,7 +75,6 @@ def meraki_get_sm_devices(network_id):
     """
 
     url = MERAKI_URL + '/networks/' + str(network_id) + '/sm/devices?fields=phoneNumber,location'
-    print(url)
     header = {'content-type': 'application/json', 'X-Cisco-Meraki-API-Key': MERAKI_API_KEY}
     sm_devices_response = requests.get(url, headers=header, verify=False)
     sm_devices_json = sm_devices_response.json()['devices']
@@ -114,11 +113,12 @@ def get_location_cell(sm_devices_list, user_cell):
 
 def main():
 
+    print('\nThe user directory is:')
     pprint(users_info_list)
     # get the Meraki organization id
 
     meraki_org_id = meraki_get_organizations()
-    print('Your Meraki Organization ID is: ', meraki_org_id)
+    print('\nYour Meraki Organization ID is: ', meraki_org_id)
 
     # get the Meraki networks info
 
@@ -138,12 +138,12 @@ def main():
     # find out the user cell phone number based on email address
 
     user_cell = get_user_cell(users_info_list, user_email)
-    print('The SM user with the email ', user_email, ' has the cell phone number ', user_cell)
+    print('\nThe SM user with the email ', user_email, ' has the cell phone number ', user_cell)
 
     # find the location for the device with the specified cell phone number
 
     user_location = get_location_cell(meraki_sm_devices_list,user_cell)
-    print('The SM user with the cell phone ', user_cell, ' is located at this address ', user_location)
+    print('\nThe SM user with the cell phone ', user_cell, ' is located at this address ', user_location)
 
 
 if __name__ == '__main__':
