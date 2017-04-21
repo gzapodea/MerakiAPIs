@@ -6,7 +6,10 @@
 
 # this module include common utilized functions to create applications using Meraki APIs
 
-
+import requests
+import json
+import meraki_init
+from meraki_init import MERAKI_API_KEY, MERAKI_ORG_ID, MERAKI_URL
 
 def meraki_get_organizations():
     """

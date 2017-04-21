@@ -9,9 +9,8 @@ import datetime
 import meraki_init
 import requests.packages.urllib3
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from requests.auth import HTTPBasicAuth  # for Basic Auth
 
-from meraki_init import MERAKI_API_KEY, MERAKI_ORG_ID
+from meraki_init import MERAKI_API_KEY, MERAKI_ORG_ID, MERAKI_URL
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)  # Disable insecure https warnings
 
@@ -21,8 +20,6 @@ users_info_list = [{'name': 'Gabi Zapodeanu', 'email': 'gzapodea@cisco.com', 'ce
                    {'name': 'Gabriel Zapodeanu', 'email': 'gabriel.zapodeanu@gmail.com', 'cell': '+15036252333'}]
 
 user_email = 'gzapodea@cisco.com'
-
-MERAKI_URL = 'https://dashboard.meraki.com/api/v0'
 
 
 def pprint(json_data):
@@ -94,6 +91,40 @@ def meraki_get_devices(network_id):
     return devices_json
 
 
+def meraki_get_ssids(network_id):
+    """
+    This function will return the Meraki Network id list of configured SSIDs
+    :param network_id: Meraki Network id
+    :return: list of SSIDs
+    """
+    url = MERAKI_URL + '/networks/' + str(network_id) + '/ssids'
+    header = {'content-type': 'application/json', 'X-Cisco-Meraki-API-Key': MERAKI_API_KEY}
+    ssids_response = requests.get(url, headers=header, verify=False)
+    ssids_json = ssids_response.json()
+
+    # filter only configured SSIDs
+    ssids_list = []
+    for ssid in ssids_json:
+        if 'Unconfigured' not in ssid['name']:
+            ssids_list.append(ssid)
+    return ssids_list
+
+
+def meraki_enable_ssid(network_id,ssid_number):
+    """
+    This function will enable the SSID with the {ssid_number}, from the Meraki network with the network_id
+    :param network_id: Meraki network id
+    :param ssid_number: Meraki SSID number
+    :return:
+    """
+    url = MERAKI_URL + '/networks/' + str(network_id) + '/ssids/' + str(ssid_number)
+    payload = {'enabled': True}
+    header = {'content-type': 'application/json', 'X-Cisco-Meraki-API-Key': MERAKI_API_KEY}
+    enable_ssid_response = requests.put(url, data=json.dumps(payload), headers=header, verify=False)
+    enable_ssid_json = enable_ssid_response.json()
+    return enable_ssid_json
+
+
 def get_user_cell(users_info, email):
     """
     This function will look up the user cell phone based on his email
@@ -154,7 +185,7 @@ def main():
     #print('Your Meraki SM Devices list: \n')
     #pprint(meraki_sm_devices_list)
 
-    # find out the user cell phone number based on email address
+    # find the user cell phone number based on email address
 
     user_cell = get_user_cell(users_info_list, user_email)
     print('\nThe SM user with the email ', user_email, ' has the cell phone number ', user_cell)
@@ -163,6 +194,38 @@ def main():
 
     user_location = get_location_cell(meraki_sm_devices_list,user_cell)
     print('\nThe SM user with the cell phone ', user_cell, ' is located at this address ', user_location)
+
+    # identify if the user is in "Sherwood"
+
+    if 'Sherwood' in user_location:
+        activate_ssid = True
+    else:
+        activate_ssid = False
+
+    # find the list of the configured Meraki SSID
+
+    meraki_ssids_list = meraki_get_ssids(meraki_network_id)
+    print('\nThe list of SSIDs for this network:')
+    pprint(meraki_ssids_list)
+
+    # find the SSID number of the "Guest" SSID
+
+    for ssid in meraki_ssids_list:
+        if ssid['name'] == 'Guest':
+            meraki_ssid_number = ssid['number']
+
+    print('\nThe Meraki "Guest" SSID number is ', meraki_ssid_number)
+
+    # Enable the Guest SSID
+
+    if activate_ssid:
+        print('\nWe will activate the "Guest" SSID')
+        meraki_ssid_status = meraki_enable_ssid(meraki_network_id, meraki_ssid_number)
+
+    if meraki_ssid_status['enabled']:
+        print('\nThe Guest SSID status is Enabled')
+    else:
+        print('\nThe Guest SSID status is Disabled')
 
 
 if __name__ == '__main__':
