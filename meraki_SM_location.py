@@ -93,6 +93,7 @@ def get_user_cell(users_info, email):
     user_cell = None
     for user in users_info:
         if user['email'] == email:
+            pprint(user)
             user_cell = user['cell']
     return user_cell
 
@@ -131,8 +132,8 @@ def main():
     # get the Meraki SM devices
 
     meraki_sm_devices_list = meraki_get_sm_devices(meraki_network_id)
-    print('Your Meraki SM Devices list: \n')
-    pprint(meraki_sm_devices_list)
+    #print('Your Meraki SM Devices list: \n')
+    #pprint(meraki_sm_devices_list)
 
     # find out the user cell phone number based on email address
 
