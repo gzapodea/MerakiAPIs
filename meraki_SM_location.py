@@ -219,14 +219,14 @@ def main():
     # Enable the Guest SSID
 
     if activate_ssid:
-        print('\nWe will activate the "Guest" SSID')
+        print('\nThe user is coming home, I will activate the "Guest" SSID')
         meraki_ssid_status = meraki_enable_ssid(meraki_network_id, meraki_ssid_number)
 
     if meraki_ssid_status['enabled']:
         print('\nThe Guest SSID status is Enabled')
     else:
-        print('\nThe Guest SSID status is Disabled')
-
+        print('\nThe Guest SSID status is Disabled\n')
+    pprint(meraki_ssid_status)
 
 if __name__ == '__main__':
     main()
