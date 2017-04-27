@@ -10,7 +10,7 @@ import meraki_init
 import requests.packages.urllib3
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
-from meraki_init import MERAKI_API_KEY, MERAKI_ORG_ID, MERAKI_URL
+from meraki_init import MERAKI_API_KEY, MERAKI_URL
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)  # Disable insecure https warnings
 

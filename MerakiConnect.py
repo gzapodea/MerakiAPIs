@@ -11,7 +11,7 @@ import requests.packages.urllib3
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from requests.auth import HTTPBasicAuth  # for Basic Auth
 
-from meraki_init import MERAKI_API_KEY, MERAKI_ORG_ID
+from meraki_init import MERAKI_API_KEY, MERAKI_URL
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)  # Disable insecure https warnings
 
@@ -22,7 +22,6 @@ users_info_list = [{'name': 'Gabi Zapodeanu', 'email': 'gzapodea@cisco.com', 'ce
 
 user_email = 'gzapodea@cisco.com'
 
-MERAKI_URL = 'https://dashboard.meraki.com/api/v0'
 
 
 def pprint(json_data):
